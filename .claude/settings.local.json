@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:moxfield.com)",
+      "WebFetch(domain:api2.moxfield.com)",
+      "WebFetch(domain:api.moxfield.com)",
+      "Bash(find /c/Users/Anwender/dev/voidcaster -type f -name *.ts -o -name *.tsx -o -name *.vue -o -name *.json -o -name *.css -o -name *.scss -o -name *.config.*)",
+      "Bash(ls -1 /c/Users/Anwender/dev/voidcaster/src/components/**/*.vue)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(npm run:*)"
+    ]
+  }
+}
