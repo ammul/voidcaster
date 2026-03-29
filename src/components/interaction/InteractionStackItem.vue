@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import type { InteractionStackItem } from '../../stores/interactionStore'
 import { useSettingsStore } from '../../stores/settingsStore'
 
-const props = defineProps<{ item: InteractionStackItem }>()
+defineProps<{ item: InteractionStackItem }>()
 const emit = defineEmits<{ dismiss: [id: string] }>()
 
 const settings = useSettingsStore()

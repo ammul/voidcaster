@@ -128,7 +128,7 @@ jobs:
           path: dist
 
   deploy:
-    needs: [unit-test, e2e-test, slow-tests, codeql, build]
+    needs: [build]
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PoliticsToastItem } from '../../stores/interactionStore'
 
-const props = defineProps<{ toast: PoliticsToastItem }>()
+defineProps<{ toast: PoliticsToastItem }>()
 const emit = defineEmits<{ dismiss: [id: string] }>()
 </script>
 

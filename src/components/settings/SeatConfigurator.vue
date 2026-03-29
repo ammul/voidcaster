@@ -9,10 +9,6 @@ const props = defineProps<{ seatIndex: 0 | 1 | 2 }>()
 const settings = useSettingsStore()
 const scryfall = useScryfallStore()
 
-const COLOR_SYMBOLS: Record<string, string> = {
-  W: '☀', U: '💧', B: '💀', R: '🔥', G: '🌲',
-}
-
 const pinned = computed(() => settings.seatArchetypes[props.seatIndex])
 const effectiveId = computed(() => settings.getEffectiveArchetypeId(props.seatIndex))
 const archetype = computed(() => ARCHETYPES.find(a => a.id === effectiveId.value) ?? ARCHETYPES[0])
