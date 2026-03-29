@@ -22,11 +22,14 @@ async function processQueue() {
 }
 
 export async function fetchFromScryfallOrCache(cardName: string): Promise<ScryfallCard> {
-  const cache = await caches.open(CACHE_NAME)
+  const hasCaches = typeof caches !== 'undefined'
   const metaKey = `scryfall-meta-${cardName}`
 
-  const cached = await cache.match(metaKey)
-  if (cached) return cached.json() as Promise<ScryfallCard>
+  if (hasCaches) {
+    const cache = await caches.open(CACHE_NAME)
+    const cached = await cache.match(metaKey)
+    if (cached) return cached.json() as Promise<ScryfallCard>
+  }
 
   const res = await fetch(
     `https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`,
@@ -40,12 +43,15 @@ export async function fetchFromScryfallOrCache(cardName: string): Promise<Scryfa
   if (!res.ok) throw new Error(`Scryfall fetch failed for "${cardName}": ${res.status}`)
   const data: ScryfallCard = await res.json()
 
-  await cache.put(
-    metaKey,
-    new Response(JSON.stringify(data), {
-      headers: { 'Content-Type': 'application/json' },
-    })
-  )
+  if (hasCaches) {
+    const cache = await caches.open(CACHE_NAME)
+    await cache.put(
+      metaKey,
+      new Response(JSON.stringify(data), {
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
+  }
 
   return data
 }
@@ -65,16 +71,20 @@ function enqueue(cardName: string): Promise<ScryfallCard> {
 }
 
 async function getCardImage(imageUrl: string): Promise<string> {
-  const cache = await caches.open(CACHE_NAME)
-
-  const cached = await cache.match(imageUrl)
-  if (cached) {
-    const blob = await cached.blob()
-    return URL.createObjectURL(blob)
+  if (typeof caches !== 'undefined') {
+    const cache = await caches.open(CACHE_NAME)
+    const cached = await cache.match(imageUrl)
+    if (cached) {
+      const blob = await cached.blob()
+      return URL.createObjectURL(blob)
+    }
   }
 
   const res = await fetch(imageUrl)
-  await cache.put(imageUrl, res.clone())
+  if (typeof caches !== 'undefined') {
+    const cache = await caches.open(CACHE_NAME)
+    await cache.put(imageUrl, res.clone())
+  }
   const blob = await res.blob()
   return URL.createObjectURL(blob)
 }
