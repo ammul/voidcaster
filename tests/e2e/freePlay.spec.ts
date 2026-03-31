@@ -5,6 +5,8 @@ test.describe('Free Play Mode', () => {
     await page.goto('/')
     // Use the Breach scenario for free play
     await page.locator('.grid > div').nth(1).locator('button', { hasText: 'Free Play' }).click()
+    // Dismiss the mulligan modal so it doesn't block clicks
+    await page.getByRole('button', { name: 'Keep' }).click()
   })
 
   test('mana pool tracker renders all 4 mana types', async ({ page }) => {

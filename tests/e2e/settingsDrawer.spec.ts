@@ -15,7 +15,7 @@ test.describe('Settings Drawer', () => {
     await page.click('[aria-label="Open settings"]')
     await expect(page.getByText('Settings').first()).toBeVisible()
     await page.keyboard.press('Escape')
-    await expect(page.getByText('Interaction Mode')).not.toBeVisible()
+    await expect(page.locator('[data-testid="settings-drawer"]')).not.toBeVisible()
   })
 
   test('drawer closes on backdrop click', async ({ page }) => {
@@ -23,7 +23,7 @@ test.describe('Settings Drawer', () => {
     await expect(page.getByText('Settings').first()).toBeVisible()
     // Click the backdrop (outside the drawer panel)
     await page.click('[data-backdrop="true"]', { position: { x: 10, y: 10 } })
-    await expect(page.getByText('Interaction Mode')).not.toBeVisible()
+    await expect(page.locator('[data-testid="settings-drawer"]')).not.toBeVisible()
   })
 
   test('Stax Meta profile updates Auto seats to stax archetypes', async ({ page }) => {

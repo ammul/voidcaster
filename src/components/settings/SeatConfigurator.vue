@@ -43,7 +43,7 @@ function onSelectChange(e: Event) {
 </script>
 
 <template>
-  <div class="glass rounded-xl p-3 flex flex-col gap-2">
+  <div class="glass rounded-xl p-3 flex flex-col gap-2" :data-testid="`seat-config-${seatIndex}`">
     <div class="font-mono text-xs" style="color: rgba(120,80,255,0.7);">Seat {{ seatIndex + 1 }}</div>
 
     <!-- Commander portrait -->

@@ -36,8 +36,7 @@ test.describe('Full combo with interaction', () => {
     // Start spellseeker tutorial
     const tutorialButtons = page.getByText('Tutorial')
     await tutorialButtons.first().click()
-    await expect(page.getByText('spellseeker', { exact: false })
-      .or(page.getByText('Spellseeker', { exact: false }))).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Spellseeker Line' })).toBeVisible()
   })
 
   test('Interaction on, advancing steps does not crash', async ({ page }) => {
@@ -45,14 +44,14 @@ test.describe('Full combo with interaction', () => {
     // Navigate to free play
     await page.getByText('Free Play').first().click()
     // Dismiss mulligan
-    const keep = page.getByText('Keep Hand').or(page.getByText('Keep'))
+    const keep = page.getByRole('button', { name: 'Keep' })
     if (await keep.isVisible({ timeout: 2000 }).catch(() => false)) {
       await keep.click()
     }
 
     // Advance a few steps
     for (let i = 0; i < 5; i++) {
-      await page.click('button:has-text("Next Step")')
+      await page.click('button:has-text("Next Phase")')
       await page.waitForTimeout(100)
     }
 

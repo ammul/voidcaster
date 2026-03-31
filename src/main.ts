@@ -10,3 +10,7 @@ app.use(createPinia())
 app.directive('focus', { mounted: (el) => el.focus() })
 
 app.mount('#app')
+
+if (import.meta.env.DEV) {
+  ;(window as any).__vue_app__ = app
+}

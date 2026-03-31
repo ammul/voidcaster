@@ -31,13 +31,12 @@ test.describe('Opponent Archetypes', () => {
 
     // Color pips for kraum_tymna: W U B R
     // They are in the SeatConfigurator component adjacent to the select
-    const seatConfig = page.locator('.glass').first()
-    await expect(seatConfig.getByText('W')).toBeVisible()
-    await expect(seatConfig.getByText('U')).toBeVisible()
-    await expect(seatConfig.getByText('B')).toBeVisible()
-    await expect(seatConfig.getByText('R')).toBeVisible()
+    const seatConfig = page.locator('[data-testid="seat-config-0"]')
+    await expect(seatConfig.locator('span').filter({ hasText: /^W$/ })).toBeVisible()
+    await expect(seatConfig.locator('span').filter({ hasText: /^U$/ })).toBeVisible()
+    await expect(seatConfig.locator('span').filter({ hasText: /^B$/ })).toBeVisible()
+    await expect(seatConfig.locator('span').filter({ hasText: /^R$/ })).toBeVisible()
     // G should NOT be visible in kraum_tymna pips
-    // (Note: other archetypes might show G, but in this seat it shouldn't)
     const gPips = seatConfig.locator('span').filter({ hasText: /^G$/ })
     await expect(gPips).toHaveCount(0)
   })

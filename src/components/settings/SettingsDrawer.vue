@@ -37,6 +37,7 @@ function onBackdropClick(e: MouseEvent) {
     class="fixed inset-0 z-[300]"
     style="background: rgba(0,0,0,0.5); backdrop-filter: blur(2px);"
     data-backdrop="true"
+    data-testid="settings-drawer"
     @click="onBackdropClick"
   >
     <!-- Drawer -->

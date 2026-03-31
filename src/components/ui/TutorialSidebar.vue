@@ -120,7 +120,7 @@ const progress = computed(() =>
             ? 'border: 1px solid rgba(0,220,255,0.1); color: rgba(0,220,255,0.3); cursor: not-allowed;'
             : 'border: 1px solid rgba(0,220,255,0.4); color: rgba(0,220,255,0.9); box-shadow: 0 0 12px rgba(0,220,255,0.1);'"
           @click="tutorial.nextStep()"
-        >Next Phase</button>
+        >Next Step</button>
       </div>
     </div>
   </div>

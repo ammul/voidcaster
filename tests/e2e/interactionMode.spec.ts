@@ -26,7 +26,7 @@ async function startFreePlay(page: import('@playwright/test').Page) {
   await page.getByText('Free Play').first().click()
   await expect(page.getByText('freeplay', { exact: false }).or(page.getByText('Free Play', { exact: false }))).toBeVisible()
   // Dismiss mulligan if present
-  const mulliganClose = page.getByText('Keep Hand').or(page.getByText('Keep'))
+  const mulliganClose = page.getByRole('button', { name: 'Keep' })
   if (await mulliganClose.isVisible()) await mulliganClose.click()
 }
 
@@ -41,7 +41,7 @@ test.describe('Interaction Mode', () => {
     await startFreePlay(page)
 
     // Emit a win attempt via game store — use the next step button
-    await page.click('button:has-text("Next Step")')
+    await page.click('button:has-text("Next Phase")')
     await page.waitForTimeout(200)
 
     // No interaction stack items
@@ -54,7 +54,7 @@ test.describe('Interaction Mode', () => {
 
     // Trigger a game action — emitAction won't be called unless we do something that emits
     // We advance step a few times to trigger a possible phase_change event
-    await page.click('button:has-text("Next Step")')
+    await page.click('button:has-text("Next Phase")')
     await page.waitForTimeout(800)
 
     // Interaction items may or may not appear depending on seed and archetype
