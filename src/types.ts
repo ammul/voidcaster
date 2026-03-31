@@ -56,6 +56,30 @@ export interface GameCard {
   pendingInallaTrigger?: { wizardInstanceId: string; wizardName: string }
 }
 
+export interface ComboStep {
+  stepNumber: number
+  action: string
+  highlightCards: string[]
+  manaChange?: Partial<Record<ManaType, number>>
+  lifeChange?: number
+  cardMoves?: Array<{ card: string; from: string; to: string }>
+  validate?: (state: {
+    hand: { name: string }[]
+    battlefield: { name: string }[]
+    graveyard: { name: string }[]
+    exile: { name: string }[]
+    manaPool?: Partial<Record<ManaType, number>>
+  }) => boolean
+}
+
+export interface ComboDefinition {
+  id: string
+  name: string
+  description: string
+  prerequisites: string
+  steps: ComboStep[]
+}
+
 export interface StackItem {
   id: string
   type: 'spell' | 'ability' | 'inalla-trigger'

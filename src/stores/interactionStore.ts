@@ -6,6 +6,7 @@ import type { OpponentArchetype } from '../data/archetypes'
 import { ARCHETYPES_BY_ID } from '../data/archetypes'
 import { useSettingsStore } from './settingsStore'
 import { useGameStore } from './gameStore'
+import { rulesEngine } from '../rules'
 
 export interface InteractionStackItem {
   id: string
@@ -38,14 +39,42 @@ export const useInteractionStore = defineStore('interaction', () => {
     if (!settings.interactionEnabled) return
 
     const game = useGameStore()
+
+    // Detect active combo line from current zone state
+    const rulesState = {
+      manaPool: game.manaPool,
+      phase: game.currentPhase,
+      step: game.currentStep,
+      stackDepth: game.stack.length,
+      lifeTotal: game.lifeTotal,
+      zones: {
+        hand: game.hand.map(c => c.name),
+        battlefield: game.battlefield.map(c => c.name),
+        graveyard: game.graveyard.map(c => c.name),
+        exile: game.exile.map(c => c.name),
+        library: game.library.map(c => c.name),
+        stack: game.stack.map(s => s.sourceCardName ?? ''),
+      },
+      spellsThisTurn: game.spellsThisTurn,
+    }
+    const activeComboLine = rulesEngine.detectActiveComboLine(rulesState) ?? undefined
+
+    // Enrich action with combo-line context and spells-this-turn count
+    const enrichedAction: GameAction = {
+      ...action,
+      activeComboLine,
+      spellsThisTurn: game.spellsThisTurn,
+    }
+
     const gameState = {
       turn: game.turn,
       stackDepth: game.stack.length,
       lifeTotal: game.lifeTotal,
+      spellsThisTurn: game.spellsThisTurn,
     }
 
     const rng = settings.getPrng()
-    const engine = new HeuristicEngine(rng)
+    const engine = new HeuristicEngine(rng, rulesEngine)
 
     const seats: Array<0 | 1 | 2> = [0, 1, 2]
 
@@ -54,7 +83,7 @@ export const useInteractionStore = defineStore('interaction', () => {
     const archetypes = archetypeIds.map(id => ARCHETYPES_BY_ID[id] ?? Object.values(ARCHETYPES_BY_ID)[0])
 
     const decisions = await Promise.all(
-      archetypes.map(archetype => engine.evaluate(action, gameState, archetype))
+      archetypes.map(archetype => engine.evaluate(enrichedAction, gameState, archetype))
     )
 
     // Reveal sequentially with 600ms stagger

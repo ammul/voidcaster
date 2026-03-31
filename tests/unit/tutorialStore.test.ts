@@ -26,7 +26,9 @@ describe('tutorialStore', () => {
     const tutorial = useTutorialStore()
     const game = useGameStore()
     tutorial.loadCombo('spellseeker')
-    // Step 1 validates that Spellseeker is on battlefield
+    // Step 1 validates Spellseeker on battlefield + mana for {2}{U}
+    game.adjustMana('U', 1)
+    game.adjustMana('C', 2)
     game.addCardToZone(game.createCard('Spellseeker', 'battlefield'), 'battlefield')
     tutorial.nextStep()
     expect(tutorial.currentStepIndex).toBe(1)
@@ -56,7 +58,8 @@ describe('tutorialStore', () => {
     const game = useGameStore()
     tutorial.loadCombo('consultation')
 
-    // Step 1: validate bf("Thassa's Oracle")
+    // Step 1: validate bf("Thassa's Oracle") + mana for {U}{U}
+    game.adjustMana('U', 2)
     game.addCardToZone(game.createCard("Thassa's Oracle", 'battlefield'), 'battlefield')
     tutorial.nextStep()
 

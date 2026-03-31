@@ -7,6 +7,10 @@ export interface GameAction {
   isWinAttempt: boolean
   isTutorable: boolean
   stackDepth: number
+  /** Which of the 3 combo lines is currently active (detected from zone state) */
+  activeComboLine?: import('../types').Scenario
+  /** Number of spells cast this turn — used for Flusterstorm branch (replaces stackDepth heuristic) */
+  spellsThisTurn?: number
 }
 
 export interface InteractionDecision {
@@ -26,6 +30,7 @@ export interface GameState {
   turn: number
   stackDepth: number
   lifeTotal: number
+  spellsThisTurn: number
 }
 
 export interface InteractionEngine {

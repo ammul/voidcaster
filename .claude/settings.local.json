@@ -8,7 +8,12 @@
       "Bash(ls -1 /c/Users/Anwender/dev/voidcaster/src/components/**/*.vue)",
       "Bash(xargs -I {} basename {})",
       "Bash(npm run:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(npm ci:*)",
+      "Bash(./node_modules/.bin/vue-tsc --noEmit 2>&1)",
+      "Bash(./node_modules/.bin/vitest run:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(VITE_BASE_URL=/ npm run build)"
     ]
   }
 }

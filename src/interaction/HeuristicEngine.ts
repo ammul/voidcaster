@@ -1,6 +1,8 @@
 import type { InteractionEngine, GameAction, InteractionDecision, GameState } from './InteractionEngine'
 import type { OpponentArchetype } from '../data/archetypes'
 import { KEY_WIZARDS } from '../data/archetypes'
+import type { RulesEngine } from '../rules/RulesEngine'
+import type { Scenario } from '../types'
 
 // Counter priority order — highest priority first
 const COUNTER_PRIORITY = [
@@ -45,20 +47,22 @@ function reasoningFor(
 
 export class HeuristicEngine implements InteractionEngine {
   private rng: () => number
+  private rules: RulesEngine | undefined
 
-  constructor(rng: () => number) {
+  constructor(rng: () => number, rules?: RulesEngine) {
     this.rng = rng
+    this.rules = rules
   }
 
   async evaluate(
     action: GameAction,
-    gameState: GameState,
+    _gameState: GameState,
     opponent: OpponentArchetype
   ): Promise<InteractionDecision> {
     const roll = this.rng()
     const commanderName = opponent.commanderNames[0]
 
-    // Branch 1: Win attempt — try to counter
+    // Branch 1: Win attempt — try to counter, then fall through to politics on pass
     if (action.isWinAttempt) {
       if (roll < opponent.threatThreshold && opponent.counterPackage.length > 0) {
         const cardUsed = pickHighestPriorityCounter(opponent.counterPackage)
@@ -69,11 +73,7 @@ export class HeuristicEngine implements InteractionEngine {
           reasoning: reasoningFor('counter', commanderName, cardUsed),
         }
       }
-      return {
-        interacts: false,
-        interactionType: 'pass',
-        reasoning: reasoningFor('pass', commanderName),
-      }
+      // Intentional fall-through: opponent passed on countering — politics may still fire below
     }
 
     // Branch 2: Key wizard creature — possible removal
@@ -118,8 +118,30 @@ export class HeuristicEngine implements InteractionEngine {
       }
     }
 
-    // Branch 4: Deep stack + Flusterstorm
-    if (action.stackDepth > 2 && opponent.counterPackage.includes('Flusterstorm')) {
+    // Branch 4: Graveyard hate — deploy archetype hate for active Breach line
+    if (action.activeComboLine && this.rules) {
+      const comboLine = action.activeComboLine as Scenario
+      const hateCards = this.rules.getHateCards(comboLine, opponent)
+      if (hateCards.length > 0) {
+        const hateRoll = this.rng()
+        if (hateRoll < 0.6) {
+          const cardUsed = hateCards[0]
+          return {
+            interacts: true,
+            interactionType: 'stax',
+            cardUsed,
+            reasoning: `${commanderName} drops ${cardUsed} — the ${comboLine} line can't resolve through this.`,
+          }
+        }
+      }
+    }
+
+    // Branch 5: Active combo chain — Flusterstorm
+    // Uses spellsThisTurn (combo-chain awareness) with stackDepth as fallback for legacy callers
+    if (
+      (action.spellsThisTurn ?? action.stackDepth) > 2 &&
+      opponent.counterPackage.includes('Flusterstorm')
+    ) {
       const flusterRoll = this.rng()
       if (flusterRoll < 0.5) {
         return {
@@ -131,10 +153,10 @@ export class HeuristicEngine implements InteractionEngine {
       }
     }
 
-    // Branch 5: Politics
+    // Branch 6: Politics — fires on win attempts when opponent would rather deal than counter
     if (
+      action.isWinAttempt &&
       opponent.politicsProfile.willDeal &&
-      gameState.turn > 3 &&
       opponent.politicsTemplates.length > 0
     ) {
       const politicsRoll = this.rng()

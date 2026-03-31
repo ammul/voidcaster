@@ -25,6 +25,7 @@ export const useGameStore = defineStore('game', () => {
   const stack = ref<StackItem[]>([])
   const lifeTotal = ref(40)
   const stormCount = ref(0)
+  const spellsThisTurn = ref(0)
   const manaPool = ref<Record<ManaType, number>>({ W: 0, U: 0, B: 0, R: 0, G: 0, C: 0 })
   const currentStep = ref<Step>('main1')
   const quickCombat = ref(false)
@@ -192,6 +193,7 @@ export const useGameStore = defineStore('game', () => {
   // ── Stack ────────────────────────────────────────────────────────────────────
   /** Emit a game action to the interaction engine (if enabled). */
   function emitAction(action: GameAction) {
+    if (action.type === 'cast_spell') spellsThisTurn.value++
     emitGameAction(action)
   }
 
@@ -233,6 +235,7 @@ export const useGameStore = defineStore('game', () => {
       case 'untap':
         allCards.value.filter(c => c.zone === 'battlefield').forEach(c => { c.tapped = false })
         stormCount.value = 0
+        spellsThisTurn.value = 0
         manaPool.value = { W: 0, U: 0, B: 0, R: 0, G: 0, C: 0 }
         if (quickBeginPhase.value) {
           drawCard()
@@ -267,6 +270,7 @@ export const useGameStore = defineStore('game', () => {
     stack.value = []
     lifeTotal.value = 40
     stormCount.value = 0
+    spellsThisTurn.value = 0
     manaPool.value = { W: 0, U: 0, B: 0, R: 0, G: 0, C: 0 }
     currentStep.value = 'untap'
     turn.value = 1
@@ -278,6 +282,7 @@ export const useGameStore = defineStore('game', () => {
     stack,
     lifeTotal,
     stormCount,
+    spellsThisTurn,
     manaPool,
     currentStep,
     quickCombat,

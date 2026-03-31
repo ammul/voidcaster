@@ -27,6 +27,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
       battlefield: snap(game.battlefield),
       graveyard: snap(game.graveyard),
       exile: snap(game.exile),
+      manaPool: { ...game.manaPool },
     })
   })
 

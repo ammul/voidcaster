@@ -17,6 +17,24 @@ test.describe('Spellseeker Tutorial', () => {
     // Step counter should show 0 / 30 initially
     await expect(page.locator('text=Step 0 / 30')).toBeVisible()
 
+    // Step 1 validates Spellseeker on battlefield + mana for {2}{U}.
+    // Inject the required game state via Pinia so canAdvance becomes true.
+    await page.evaluate(() => {
+      // @ts-ignore
+      const pinia = window.__vue_app__?.config?.globalProperties?.$pinia
+      if (!pinia) return
+      const game = pinia.state.value.game
+      game.manaPool.C = 2
+      game.manaPool.U = 1
+      game.allCards.push({
+        instanceId: 'e2e-spellseeker',
+        name: 'Spellseeker',
+        scryfallData: null, artCropUrl: null, normalImageUrl: null,
+        isLoading: false, isToken: false, tapped: false,
+        zone: 'battlefield', markedForExile: false, highlightedInTutorial: false,
+      })
+    })
+
     await nextBtn.click()
     await expect(page.locator('text=Step 1 / 30')).toBeVisible()
   })
